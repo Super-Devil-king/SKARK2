@@ -1,16 +1,13 @@
 [tool.poetry]
-name = "skark-website"  # Should match the package name
+name = "skark-website"   # This should match the directory name
 version = "0.1.0"
-description = "A short description of your project"
+description = "Your project description"
 authors = ["Your Name <you@example.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.11"
 Flask = "^2.3.3"
-requests = "^2.32.3"
-
-[tool.poetry.packages]
-include = [{ include = "skark_website", from = "." }]  # This line ensures Poetry knows where to find your package
+# Add other dependencies as needed
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
