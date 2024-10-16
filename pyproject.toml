@@ -6,7 +6,7 @@ authors = ["Your Name <you@example.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.11"
-Flask = "^2.3.3"
+flask = "^2.3.3"
 # Add other dependencies as needed
 
 [build-system]
