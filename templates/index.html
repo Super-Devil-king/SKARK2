@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SKARK Banking System - Beta</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #41B06E;
+            color: #f8f8f2;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            min-height: 100vh;
+            background: linear-gradient(180deg, #0F0F0F, #005B41 200%, #0F0F0F);
+            flex-direction: column;
+            position: relative;
+            animation: fadeInBackground 2s ease-in-out;
+        }
+
+        @keyframes fadeInBackground {
+            0% {
+                opacity: 0;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        #clear-btn,
+        #exit-btn {
+            padding: 10px 15px;
+            background-color: #005B41;
+            color: white;
+            border: 2px solid white;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s ease, transform 0.2s ease, border 0.2s ease;
+            position: fixed;
+            top: 10px;
+            z-index: 10;
+        }
+
+        #clear-btn {
+            left: 10px;
+        }
+
+        #exit-btn {
+            right: 10px;
+        }
+
+        #clear-btn:hover,
+        #exit-btn:hover {
+            background-color: #ff4444;
+            transform: scale(1.05);
+            border: none;
+        }
+
+        #title {
+            font-size: 24px;
+            color: #ffffff;
+            margin-bottom: 20px;
+            text-align: center;
+            position: fixed;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        #chatbox {
+            width: 100%;
+            max-width: 500px;
+            background-color: #2c2f3c;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            max-height: 70vh;
+            position: relative;
+            margin-bottom: 10px;
+            margin-left: auto;
+            margin-right: auto;
+            margin-top: 40px;
+            border: 3px solid transparent;
+        }
+
+        #messages {
+            flex-grow: 1;
+            padding-right: 1px;
+            margin-bottom: 20px;
+            user-select: none;
+            overflow-y: hidden;
+            scrollbar-width: none;
+        }
+
+        #messages::-webkit-scrollbar {
+            display: none;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 12px 18px;
+            border-radius: 10px;
+            line-height: 1.5;
+            font-size: 14px;
+            word-wrap: break-word;
+            max-width: 80%;
+            opacity: 0;
+            animation: fadeInMessage 0.5s ease-in-out forwards;
+            clear: both;
+        }
+
+        @keyframes fadeInMessage {
+            0% {
+                opacity: 0;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .message.user-message {
+            background: linear-gradient(135deg, #4e537c, #3d8f55);
+            color: white;
+            float: right;
+            clear: both;
+        }
+
+        .message.bot-message {
+            background-color: #61c97e;
+            color: black;
+            float: left;
+        }
+
+        input {
+            max-height: 90px;
+            min-height: 40px;
+            width: calc(100% - 50px);
+            padding: 10px;
+            border: none;
+            border-radius: 10px;
+            background-color: #343848;
+            color: white;
+            font-size: 14px;
+            resize: none;
+            overflow-y: auto;
+            margin-right: 20px;
+            transition: all 0.3s ease;
+            scrollbar-width: none;
+        }
+
+        input:focus {
+            outline: none;
+            border: 1px solid #61c97e;
+            box-shadow: 0px 0px 5px rgba(97, 201, 126, 0.5);
+        }
+
+        input::-webkit-scrollbar {
+            display: none;
+        }
+
+        button {
+            padding: 10px;
+            background-color: #4e537c;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #61c97e;
+            transform: scale(1.05);
+        }
+
+        .loader-border {
+            position: absolute;
+            top: 2px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            border: 3px solid transparent;
+            border-radius: 15px;
+            pointer-events: none;
+            overflow: hidden;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .loader-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: #00bfff;
+            position: absolute;
+            animation: moveAlongBorder 4s infinite linear;
+        }
+
+        @keyframes moveAlongBorder {
+            0% {
+                top: 0;
+                left: 0;
+            }
+
+            25% {
+                top: 0;
+                left: calc(100% - 12px);
+            }
+
+            50% {
+                top: calc(100% - 12px);
+                left: calc(100% - 12px);
+            }
+
+            75% {
+                top: calc(100% - 12px);
+                left: 0;
+            }
+
+            100% {
+                top: 0;
+                left: 0;
+            }
+        }
+
+        #copyright {
+            font-size: 14px;
+            color: #ffffff;
+            text-align: center;
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin-top: 10px;
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        #labelL1 {
+            font-size: 14px;
+            color: #ffffff;
+            text-align: center;
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin-top: 1px;
+            position: fixed;
+            bottom: 140px;
+            left: 5%;
+            transform: translateX(-50%);
+            writing-mode: vertical-rl;
+        }
+
+        #labelL2 {
+            font-size: 14px;
+            color: #ffffff;
+            text-align: center;
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin-top: 1px;
+            position: fixed;
+            top: 250px;
+            left: 5%;
+            transform: translateX(-50%);
+            writing-mode: vertical-rl;
+        }
+
+        #labelR1 {
+            font-size: 14px;
+            color: #ffffff;
+            text-align: center;
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin-top: 1px;
+            position: fixed;
+            bottom: 140px;
+            right: 5%;
+            transform: translateX(-50%);
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+        }
+
+        #labelR2 {
+            font-size: 14px;
+            color: #ffffff;
+            text-align: center;
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin-top: 1px;
+            position: fixed;
+            top: 250px;
+            right: 5%;
+            transform: translateX(-50%);
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+        }
+
+        #version {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            font-size: 12px;
+            color: white;
+            font-weight: 600;
+            opacity: 0.8;
+        }
+
+       /* First hidden box */
+        #hidden-box {
+            position: fixed;
+            top: 60%;
+            left: -150px;
+            width: 200px;
+            height: 250px;
+            background-color: transparent;
+            border: 2px solid white;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.5s ease;
+            font-size: 16px;
+            border-radius: 10px;
+            color: rgba(255, 255, 255, 0);
+        }
+
+        #hidden-box:hover {
+            left: 0;
+            background-color: black;
+            color: rgba(255, 255, 255, 1);
+        }
+
+        #hidden-box p {
+            margin: 0;
+            padding: 0;
+            font-weight: 600;
+            color: transparent;
+            transition: color 0.5s ease;
+        }
+
+        #hidden-box:hover p {
+            color: white;
+        }
+
+        /* Second hidden box (L2) */
+        #hidden-boxL2 {
+            position: fixed;
+            top: 20%;
+            left: -170px;
+            width: 220px;
+            height: 250px;
+            background-color: transparent;
+            border: 2px solid white;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.5s ease;
+            font-size: 16px;
+            border-radius: 10px;
+            color: rgba(255, 255, 255, 0);
+        }
+
+        #hidden-boxL2:hover {
+            left: 0;
+            background-color: black;
+            color: rgba(255, 255, 255, 1);
+        }
+
+        #hidden-boxL2 p {
+            margin: 0;
+            padding: 0;
+            font-weight: 600;
+            color: transparent;
+            transition: color 0.5s ease;
+        }
+
+        #hidden-boxL2:hover p {
+            color: white;
+        }
+
+        /* Third hidden box (R1) */
+        #hidden-boxR1 {
+            position: fixed;
+            top: 20%;
+            right: -160px; /* Initially hide off-screen */
+            width: 220px;
+            height: 250px;
+            background-color: transparent;
+            border: 2px solid white;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: right 0.5s ease; /* Slide effect on hover */
+            font-size: 16px;
+            border-radius: 10px;
+            color: rgba(255, 255, 255, 0);
+        }
+
+        #hidden-boxR1:hover {
+            right: 0; /* Slide in from the right */
+            background-color: black;
+            color: rgba(255, 255, 255, 1);
+        }
+
+        #hidden-boxR1 p {
+            margin: 0;
+            padding: 0;
+            font-weight: 600;
+            color: transparent;
+            transition: color 0.5s ease;
+        }
+
+        #hidden-boxR1:hover p {
+            color: white;
+        }
+
+        /* Fourth hidden box (R2) */
+        #hidden-boxR2 {
+            position: fixed;
+            top: 60%;
+            right: -140px;
+            width: 200px;
+            height: 250px;
+            background-color: transparent;
+            border: 2px solid white;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.5s ease;
+            font-size: 16px;
+            border-radius: 10px;
+            color: rgba(255, 255, 255, 0);
+        }
+
+        #hidden-boxR2:hover {
+            right: 0;
+            background-color: black;
+            color: rgba(255, 255, 255, 1);
+        }
+
+        #hidden-boxR2 p {
+            margin: 0;
+            padding: 0;
+            font-weight: 600;
+            color: transparent;
+            transition: color 0.5s ease;
+        }
+
+        #hidden-boxR2:hover p {
+            color: white;
+        }
+
+        #chatbox {
+            z-index: 1; /* Lower z-index so that hidden boxes come above */
+        }
+
+        #hidden-box, 
+        #hidden-boxL2, 
+        #hidden-boxR1, 
+        #hidden-boxR2 {
+            z-index: 5; /* Bring hidden boxes above the chatbox */
+        }
+        @media screen and (max-width: 768px) {
+            #title {
+                font-size: 20px;
+                top: 40px;
+            }
+
+            #chatbox {
+                width: 95%;
+                padding: 15px;
+                max-height: 60vh;
+            }
+
+            .message {
+                font-size: 12px;
+            }
+
+            input {
+                font-size: 12px;
+                padding: 8px;
+                margin-right: 10px;
+            }
+
+            button {
+                padding: 8px;
+                font-size: 12px;
+            }
+
+            #clear-btn,
+            #exit-btn {
+                padding: 8px 10px;
+                font-size: 12px;
+            }
+
+            #hidden-box, #hidden-boxL2, #hidden-boxR1, #hidden-boxR2 {
+                font-size: 14px;
+                width: 180px;
+                height: 200px;
+            }
+
+            #copyright {
+                font-size: 12px;
+                bottom: 20px;
+            }
+
+            #version {
+                font-size: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <svg style="position: fixed; top: 250px; right: 225px; z-index: -10; transform: rotate(25deg);">
+    <image href="{{ url_for('static', filename='leaf2.png') }}" width="150" height="150"/>
+    </svg>
+    <svg style="position: fixed; top: 340px; left: 225px; z-index: -10; transform: rotate(210deg);">
+    <image href="{{ url_for('static', filename='leaf2.png') }}" width="150" height="150"/>
+    </svg>
+    <div class="button-wrapper" style="top: 10px; left: 10px; position: fixed;">
+        <button id="clear-btn" onclick="confirmClear()">Clear All</button>
+        <div class="question-mark">?</div>
+    </div>
+
+    <div class="button-wrapper" style="top: 10px; right: 10px; position: fixed;">
+        <button id="exit-btn" onclick="confirmExit()">Exit</button>
+        <div class="question-mark">?</div>
+    </div>
+
+    <div id="title">SKARK Banking System <span style="font-size: 14px;">Beta</span></div>
+
+    <!-- First hidden box -->
+    <div id="hidden-box">
+        <ol style="list-style: circle">
+            <span style="font-size: 30px;">Our Team</span>
+            <li>Sarabdeep</li>
+            <li>Kiran</li>
+            <li>Arshnoor</li>
+            <li>Ranbir</li>
+            <li>Kajal</li>
+        </ol>
+    </div>
+
+    <!-- Second hidden box (L2) -->
+    <div id="hidden-boxL2">
+        <ol style="list-style: circle">
+            <span style="font-size: 30px;">About</span>
+            <li>Created: Oct,2024</li>
+            <li>By: Students</li>
+            <li>For: min-proj</li>
+            <li>Security features:All</li>
+            <li>Online: True.</li>
+        </ol>
+    </div>
+
+    <!-- Third hidden box (R1) -->
+    <div id="hidden-boxR1">
+        <ol style="list-style: circle">
+            <span style="font-size: 30px;">Feedback</span>
+            <li>mail: Ask in chat!</li>
+            <li>call:+91-90411-07458</li>
+            <li>+Coming Soon</li>
+        </ol>
+    </div>
+
+    <!-- Fourth hidden box (R2) -->
+    <div id="hidden-boxR2">
+        <ol style="list-style: circle">
+            <span style="font-size: 30px;">Utils</span>
+            <li>Transactions</li>
+            <li>loans and more</li>
+            <li>currency-exch</li>
+            <li>Security</li>
+        </ol>
+    </div>
+
+    <div id="chatbox">
+        <div id="messages"></div>
+
+        <div style="display: flex;">
+            <input type="text" id="user-input" placeholder="Welcome user, enter your choice to start" oninput="autoResizeInput(this)"
+                onkeypress="checkEnter(event)">
+            <button id="send-btn" onclick="sendMessage()">Send</button>
+        </div>
+
+        <div class="loader-border">
+            <div class="loader-dot"></div>
+        </div>
+    </div>
+
+    <div id="copyright">
+        &copy; 2024 SKARK Banking System
+    </div>
+
+    <div id="labelL1">
+        <span style="font-size: 17px;">Our Team</span>
+    </div>
+    <div id="labelL2">
+        <span style="font-size: 17px;">About Us</span>
+    </div>
+    <div id="labelR1">
+        <span style="font-size: 17px;">Utilities</span>
+    </div>
+    <div id="labelR2">
+        <span style="font-size: 17px;">Feedback</span>
+    </div>
+
+    <div id="version">0.Re3</div>
+
+    <script>
+        function showLoading() {
+            document.querySelector('.loader-border').style.opacity = '1';
+            document.getElementById('user-input').disabled = true; // Disable input
+            document.getElementById('send-btn').disabled = true; // Disable send button
+        }
+
+        function hideLoading() {
+            document.querySelector('.loader-border').style.opacity = '0';
+            document.getElementById('user-input').disabled = false; // Enable input
+            document.getElementById('send-btn').disabled = false; // Enable send button
+            document.getElementById('user-input').focus(); // Automatically focus input
+        }
+
+        function autoResizeInput(input) {
+            input.style.height = 'auto';
+            input.style.height = input.scrollHeight + 'px';
+        }
+
+        function checkEnter(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+        // Detect DevTools open with a performance measurement trick
+        function detectDevTools() {
+            let devtoolsDetected = false;
+            const threshold = 100;
+            const start = performance.now();
+            debugger; // This will pause if DevTools is open
+            if (performance.now() - start > threshold) {
+                devtoolsDetected = true;
+                alert('DevTools detected! Exiting...');
+                window.close(); // Close the tab
+            }
+        }
+
+        setInterval(detectDevTools, 1000); // Check for DevTools every second
+
+        // Disable right-click, F12, and common DevTools key combinations
+        document.addEventListener('contextmenu', function (event) {
+            event.preventDefault(); // Disable right-click
+        });
+
+        document.addEventListener('keydown', function (event) {
+            if (
+                event.keyCode === 123 || // F12
+                (event.ctrlKey && event.shiftKey && event.keyCode === 73) || // Ctrl+Shift+I
+                (event.ctrlKey && event.shiftKey && event.keyCode === 67) || // Ctrl+Shift+C
+                (event.ctrlKey && event.shiftKey && event.keyCode === 74) || // Ctrl+Shift+J
+                (event.ctrlKey && event.keyCode === 85) // Ctrl+U (view source)
+            ) {
+                event.preventDefault();
+                alert('Restricted action! Exiting...');
+                window.close(); // Close the tab
+            }
+        });
+
+        // Disable console usage
+        console.log = function () {};
+        console.error = function () {};
+        console.warn = function () {};
+        console.info = function () {};
+        console.debug = function () {};
+        window.console = {
+            log: function () {},
+            error: function () {},
+            warn: function () {},
+            info: function () {},
+            debug: function () {}
+        };
+
+        function showLoading() {
+            document.querySelector('.loader-border').style.opacity = '1';
+            document.getElementById('user-input').disabled = true; // Disable input
+            document.getElementById('send-btn').disabled = true; // Disable send button
+        }
+    
+        function hideLoading() {
+            document.querySelector('.loader-border').style.opacity = '0';
+            document.getElementById('user-input').disabled = false; // Enable input
+            document.getElementById('send-btn').disabled = false; // Enable send button
+            document.getElementById('user-input').focus(); // Automatically focus input
+        }
+    
+        function autoResizeInput(input) {
+            input.style.height = 'auto';
+            input.style.height = input.scrollHeight + 'px';
+        }
+    
+        function checkEnter(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+    
+        function sendMessage() {
+            var userInput = document.getElementById('user-input').value;
+            if (userInput === '') return; // Check for empty input
+    
+            showLoading(); // Show loader
+    
+            // Add the user message to the chat
+            var userMessage = document.createElement('div');
+            userMessage.className = 'message user-message';
+            userMessage.textContent = userInput;
+            document.getElementById('messages').appendChild(userMessage);
+    
+            // Clear the input field and resize
+            document.getElementById('user-input').value = '';
+            autoResizeInput(document.getElementById('user-input'));
+    
+            // Scroll chat to bottom
+            document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
+    
+            // Send the message to the backend using Fetch API
+            fetch('/get_response', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message: userInput }), // Send the user's message in the request body
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Add a 2-3 seconds delay before showing the bot's response
+                setTimeout(function() {
+                    hideLoading(); // Hide loader after delay
+    
+                    // Display bot's response in the chat as HTML
+                    var botMessage = document.createElement('div');
+                    botMessage.className = 'message bot-message';
+                    botMessage.innerHTML = data.response; // Render as HTML, not text
+                    document.getElementById('messages').appendChild(botMessage);
+    
+                    // Scroll chat to bottom
+                    document.getElementById('user-input').placeholder = 'Sir, please type to chat';
+                    document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
+    
+                    // Save chat history after bot response
+                    saveChatHistory();
+                }, 900); // 2000ms = 2 seconds delay
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                hideLoading();
+            });
+            // Save chat history after sending user message
+            saveChatHistory();
+        }
+    
+        function confirmExit() {
+            if (confirm('Goodbye! Do you really want to exit?')) {
+                window.close();
+            }
+        }
+    
+        function loadChatHistory() {
+            const savedMessages = localStorage.getItem('chatMessages');
+            if (savedMessages) {
+                document.getElementById('messages').innerHTML = savedMessages;
+            }
+        }
+    
+        function saveChatHistory() {
+            const messagesHTML = document.getElementById('messages').innerHTML;
+            localStorage.setItem('chatMessages', messagesHTML);
+        }
+    
+        // Clear chat and clear localStorage when pressing "Clear All"
+        function confirmClear() {
+            if (confirm('Are you sure you want to clear all messages?')) {
+                document.getElementById('messages').innerHTML = '';
+                localStorage.removeItem('chatMessages');  // Clear chat history from localStorage
+            }
+        }
+    
+        // Load chat history on page load
+        window.onload = function () {
+            loadChatHistory(); // Load chat history from localStorage
+        };
+    </script>
+</body>
+
+</html>
