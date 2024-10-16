@@ -1,13 +1,13 @@
 [tool.poetry]
-name = "Skark-website"
+name = "Skark_website"  # Replace with your project name
 version = "0.1.0"
-description = "on it"
-authors = ["Ranbir"]
+description = "A short description of your project"
+authors = ["Your Name <you@example.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.11"
-Flask = "^2.2.3"
-requests = "^2.28.1"
+Flask = "^2.2.3"  # Example dependency
+requests = "^2.28.1"  # Example dependency
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
