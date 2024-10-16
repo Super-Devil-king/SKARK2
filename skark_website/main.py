@@ -61,5 +61,5 @@ def get_response():
 
 # Start the Flask app
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=10000)  # Change port to 10000 for Render
+    app.run(debug=True)  # Change port to 10000 for Render
 
