@@ -7,8 +7,10 @@ authors = ["Your Name <you@example.com>"]
 [tool.poetry.dependencies]
 python = "^3.11"
 flask = "^2.3.3"
+gunicorn = "^20.1"
 # Add other dependencies as needed
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
