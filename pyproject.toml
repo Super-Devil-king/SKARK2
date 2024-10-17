@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "skark-website"   # This should match the directory name
+name = "skark-website"
 version = "0.1.0"
 description = "Your project description"
 authors = ["Your Name <you@example.com>"]
@@ -10,9 +10,8 @@ flask = "^2.3.3"
 gunicorn = "^20.1"
 
 [tool.poetry.scripts]
-skark-website = "skark_website.main:app"
+start = "skark_website.main:app"  # Entry point for your app
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
-
