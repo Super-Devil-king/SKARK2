@@ -18,5 +18,4 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.packages]
 [[tool.poetry.packages]]
-include = "skark_website"
-from = "skark-website"
+include = "skark-website"
