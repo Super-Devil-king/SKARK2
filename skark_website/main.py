@@ -59,7 +59,3 @@ def get_response():
     # Return the response as JSON
     return jsonify({'response': response})
 
-# Start the Flask app
-if __name__ == '__main__':
-    app.run(debug=True)  # Change port to 10000 for Render
-
