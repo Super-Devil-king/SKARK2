@@ -8,12 +8,9 @@ authors = ["Your Name <you@example.com>"]
 python = "^3.11"
 flask = "^2.3.3"
 gunicorn = "^20.1"
-# Add other dependencies as needed
-
 
 [tool.poetry.scripts]
 skark-website = "skark_website.main:app"
-
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
